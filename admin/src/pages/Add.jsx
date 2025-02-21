@@ -12,8 +12,11 @@ const Add = ({ token }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("Books");
-  const [subCategory, setSubCategory] = useState("2025");
+  const [originalPrice, setOriginalPrice] = useState("");
+  const [category, setCategory] = useState("Engineering");
+  const [subCategory, setSubCategory] = useState("BOOKS");
+  const [quality, setQuality] = useState("GOOD");
+  const [year, setYear] = useState("2025");
   const [bestseller, setBestSeller] = useState(false);
 
   const onSubmithandler = async (event) => {
@@ -23,8 +26,11 @@ const Add = ({ token }) => {
       formData.append("name", name);
       formData.append("description", description);
       formData.append("price", price);
+      formData.append("originalPrice", originalPrice);
       formData.append("category", category);
       formData.append("subCategory", subCategory);
+      formData.append("quality", quality);
+      formData.append("year", year);
       formData.append("bestseller", bestseller);
 
       image1 && formData.append("image1", image1);
@@ -47,6 +53,11 @@ const Add = ({ token }) => {
         setImage3(false);
         setImage4(false);
         setPrice("");
+        setOriginalPrice("");
+        setSubCategory("BOOK");
+        setCategory("Engineering");
+        setQuality("GOOD");
+        setYear("2025");
       } else {
         toast.error(response.data.message);
       }
@@ -145,34 +156,78 @@ const Add = ({ token }) => {
           <p className="mb-2">Product Category</p>
           <select
             onChange={(e) => setCategory(e.target.value)}
+            value={category}
             className="w-full px-3 py-2"
           >
-            <option value="Books">Books</option>
-            <option value="Notes">Notes</option>
-            <option value="Quantum">Quantum</option>
-            <option value="others">others</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Dental">Dental</option>
+            <option value="Pharmacy">Pharmacy</option>
+            <option value="Competitive Exam">Competitive Exam</option>
+            <option value="MBA/LLB/B.Com/..">MBA/LLB/B.Com/..</option>
           </select>
         </div>
         <div>
           <p className="mb-2">Product Sub Category</p>
           <select
             onChange={(e) => setSubCategory(e.target.value)}
+            value={subCategory}
+            className="w-full px-3 py-2"
+          >
+            <option value="Books">Books</option>
+            <option value="Notes">Notes</option>
+            <option value="Quantum">Quantum</option>
+            <option value="Sports">Sports</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
+      <div>
+          <p className="mb-2">Product Year</p>
+          <select
+            onChange={(e) => setYear(e.target.value)}
+            value={year}
             className="w-full px-3 py-2"
           >
             <option value="2025">2025</option>
             <option value="2024">2024</option>
             <option value="2023">2023</option>
             <option value="2022">2022</option>
+            <option value="Others">Others</option>
           </select>
         </div>
         <div>
+          <p className="mb-2">Product Quality</p>
+          <select
+            onChange={(e) => setQuality(e.target.value)}
+            value={quality}
+            className="w-full px-3 py-2"
+          >
+            <option value="Good">Good</option>
+            <option value="Average">Average</option>
+            <option value="Bad">Bad</option>
+          </select>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
+      <div>
           <p className="mb-2">Product Price</p>
           <input
             onChange={(e) => setPrice(e.target.value)}
             value={price}
             className="w-full px-3 py-2 sm:w-[120px]"
             type="number"
-            placeholder="25"
+            placeholder="Price"
+          />
+        </div>
+        <div>
+          <p className="mb-2">Original Price</p>
+          <input
+            onChange={(e) => setOriginalPrice(e.target.value)}
+            value={originalPrice}
+            className="w-full px-3 py-2 sm:w-[120px]"
+            type="number"
+            placeholder="Original Price"
           />
         </div>
       </div>

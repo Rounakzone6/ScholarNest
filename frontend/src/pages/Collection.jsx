@@ -9,6 +9,7 @@ const Collection = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
+  const [year, setYear] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState("relevent");
   const toggleCategory = (e) => {
@@ -23,6 +24,13 @@ const Collection = () => {
       setSubCategory((prev) => prev.filter((item) => item !== e.target.value));
     } else {
       setSubCategory((prev) => [...prev, e.target.value]);
+    }
+  };
+  const toggleYear = (e) => {
+    if (year.includes(e.target.value)) {
+      setYear((prev) => prev.filter((item) => item !== e.target.value));
+    } else {
+      setYear((prev) => [...prev, e.target.value]);
     }
   };
 
@@ -45,6 +53,11 @@ const Collection = () => {
         subCategory.includes(item.subCategory)
       );
     }
+    if (year.length > 0) {
+      productsCopy = productsCopy.filter((item) =>
+        year.includes(item.year)
+      );
+    }
     setFilterProducts(productsCopy);
   };
 
@@ -65,7 +78,7 @@ const Collection = () => {
 
   useEffect(() => {
     applyFilter();
-  }, [products, category, subCategory, search, showSearch]);
+  }, [products, category, year, subCategory, search, showSearch]);
 
   useEffect(() => {
     sortProduct();
@@ -88,7 +101,7 @@ const Collection = () => {
         </p>
         {/* Category Filter */}
         <div
-          className={`border border-gray-300 pl-5 py-3 mt-6 ${
+          className={`border border-gray-300 pl-5 py-3 mt-4 ${
             showFilter ? "" : "hidden"
           } sm:block`}
         >
@@ -143,7 +156,7 @@ const Collection = () => {
         </div>
         {/* Subcategory Filter */}
         <div
-          className={`border border-gray-300 pl-5 py-3 my-5 ${
+          className={`border border-gray-300 pl-5 py-3 my-2 ${
             showFilter ? "" : "hidden"
           } sm:block`}
         >
@@ -154,7 +167,7 @@ const Collection = () => {
                 onChange={toggleSubCategory}
                 className="w-3"
                 type="checkbox"
-                value={"2025"}
+                value={"Books"}
               />{" "}
               Books
             </p>
@@ -163,7 +176,7 @@ const Collection = () => {
                 onChange={toggleSubCategory}
                 className="w-3"
                 type="checkbox"
-                value={"2024"}
+                value={"Notes"}
               />{" "}
               Notes
             </p>
@@ -172,7 +185,7 @@ const Collection = () => {
                 onChange={toggleSubCategory}
                 className="w-3"
                 type="checkbox"
-                value={"2023"}
+                value={"Quantum"}
               />{" "}
               Quantum
             </p>
@@ -181,7 +194,7 @@ const Collection = () => {
                 onChange={toggleSubCategory}
                 className="w-3"
                 type="checkbox"
-                value={"2023"}
+                value={"Stationary Items"}
               />{" "}
               Stationary Items
             </p>
@@ -190,7 +203,62 @@ const Collection = () => {
                 onChange={toggleSubCategory}
                 className="w-3"
                 type="checkbox"
+                value={"Others"}
+              />{" "}
+              Others
+            </p>
+          </div>
+        </div>
+        {/* Subcategory Filter */}
+        <div
+          className={`border border-gray-300 pl-5 py-3 my-2 ${
+            showFilter ? "" : "hidden"
+          } sm:block`}
+        >
+          <p className="mb-3 text-sm font-medium">YEAR</p>
+          <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
+            <p className="flex gap-2">
+              <input
+                onChange={toggleYear}
+                className="w-3"
+                type="checkbox"
+                value={"2025"}
+              />{" "}
+              2025
+            </p>
+            <p className="flex gap-2">
+              <input
+                onChange={toggleYear}
+                className="w-3"
+                type="checkbox"
+                value={"2024"}
+              />{" "}
+              2024
+            </p>
+            <p className="flex gap-2">
+              <input
+                onChange={toggleYear}
+                className="w-3"
+                type="checkbox"
                 value={"2023"}
+              />{" "}
+              2023
+            </p>
+            <p className="flex gap-2">
+              <input
+                onChange={toggleYear}
+                className="w-3"
+                type="checkbox"
+                value={"2023"}
+              />{" "}
+              2022
+            </p>
+            <p className="flex gap-2">
+              <input
+                onChange={toggleYear}
+                className="w-3"
+                type="checkbox"
+                value={"Others"}
               />{" "}
               Others
             </p>

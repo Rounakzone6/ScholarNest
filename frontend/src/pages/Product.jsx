@@ -6,7 +6,7 @@ import RelatedProducts from "../components/RelatedProducts";
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { products, navigate, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
 
@@ -56,23 +56,49 @@ const Product = () => {
             <img src={assets.star_dull_icon} alt="" className="w-3 5" />
             <p className="pl-2">(122)</p>
           </div>
-          <p className="mt-5 text-3xl font-medium">
-            {currency} {productData.price}
-          </p>
           <p className="mt-5 text-gray-500 md:w-4/5">
             {productData.description}
           </p>
-          <button
-            onClick={() => addToCart(productData._id)}
-            className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
-          >
-            ADD TO CART
-          </button>
-          <hr className="mt-8 sm:w-4/5" />
+          <p className="mt-2">
+            Quality:{" "}
+            <span className="text-base font-semibold">
+              {productData.quality}
+            </span>
+          </p>
+          <p className="mt-2">
+            Market Price:{" "}
+            <span className="text-base font-semibold text-gray-800/60 line-through">
+              {currency} {productData.originalPrice}
+            </span>
+          </p>
+          <p className="text-3xl font-medium mt-1">
+            Price: {currency} {productData.price}
+          </p>
+          <div className="flex gap-1 mt-2">
+            <button
+              onClick={() => addToCart(productData._id)}
+              className="bg-black rounded-xl text-white px-8 py-3 text-sm active:bg-gray-700"
+            >
+              ADD TO CART
+            </button>
+            <button
+              onClick={() => {
+                addToCart(productData._id);
+                navigate("/cart");
+              }}
+              className="w-auto rounded-xl py-3 px-8 text-sm bg-orange-500 text-white hover:bg-orange-600 transition"
+            >
+              Buy now
+            </button>
+          </div>
+          <hr className="mt-4 sm:w-4/5" />
           <div className="text-sm text-gray-500 mt5 flex flex-col gap-1">
-            <p>100% Original Product.</p>
-            <p>Cash on delivery is available on this product.</p>
-            <p>Easy return and exchange policy within 7 days.</p>
+            <p className="font-bold text-black">Available Offers</p>
+            <div>
+              <p><b>Bank Offer5%</b> Unlimited Cashback on Flipkart Axis Bank Credit Card <span className="text-blue-500">T&C</span></p>
+              <p><b>Bank Offer10% off</b>, up to ₹1500, on Flipkart Axis Bank Credit Card EMI Txns, on orders of ₹5,000 and above <span className="text-blue-500">T&C</span></p>
+              <p><b>Bank Offer10% off</b>, up to ₹1,200 on HDFC Bank Credit Card EMI on 6 and 9 months tenure. Min Txn Value: ₹5000 <span className="text-blue-500">T&C</span></p>
+            </div>
           </div>
         </div>
       </div>
@@ -83,14 +109,9 @@ const Product = () => {
           <p className="border px-5 py-3 text-sm">Reviews (122)</p>
         </div>
         <div className="flex flex-col gap-4 border p-6 text-sm text-gray-500">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium
-            quibusdam velit dolore! Sit, nobis sequi.
-          </p>
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Reiciendis
-            odio officiis ex perspiciatis voluptatum quaerat.
-          </p>
+          <p>100% Original Product.</p>
+          <p>Cash on delivery is available on this product.</p>
+          <p>Easy return and exchange policy within 7 days.</p>
         </div>
       </div>
       {/* Display Related Product */}
