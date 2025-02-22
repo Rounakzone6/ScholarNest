@@ -13,7 +13,7 @@ const Footer = () => {
               navigate("/");
               window.scrollTo(0, 0);
             }}
-            className="w-32 mb-5"
+            className="w-36 mb-5"
             src={assets.logo}
             alt=""
           />

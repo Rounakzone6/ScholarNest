@@ -28,7 +28,7 @@ const Navbar = () => {
           navigate("/");
           window.scrollTo(0, 0);
         }}
-        className="w-36"
+        className="w-40"
         src={assets.logo}
         alt=""
       />
