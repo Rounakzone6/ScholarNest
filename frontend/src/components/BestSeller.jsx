@@ -17,7 +17,7 @@ const BestSeller = () => {
       <div className="text-center text-3xl py-8">
         <Title text1={"BEST"} text2={"SELLERS"} />
         <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-        Discover the most in-demand books, notes, and stationery items on CampusBazaar. Handpicked from top student sellers, these items go fast—grab yours before they’re gone! 🚀
+        Discover the most in-demand books, notes, and stationery items on ScholarNest. Handpicked from top student sellers, these items go fast—grab yours before they’re gone! 🚀
         </p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-y-6">

@@ -5,7 +5,7 @@ import Title from "../components/Title";
 import { ShopContext } from "../context/ShopContext";
 
 const Contact = () => {
-  const {navigate} = useContext(ShopContext)
+  const { navigate } = useContext(ShopContext);
   return (
     <div>
       <div className="text-center text-2xl pt-10 border-t">
@@ -23,20 +23,23 @@ const Contact = () => {
             BBD University <br /> Lucknow, Uttar Pradesh (226028)
           </p>
           <p className="text-gray-500">
-            Tel: 011-2303 9251 <br /> Email: campusbazaar@gmail.com
+            Tel: +91 7667991277 <br /> Email: rounakgupta002@gmail.com
           </p>
           <p className="font-semibold text-xl text-gray-600">
-            Careers at CampusBazaar
+            Careers at ScholarNest
           </p>
           <p className="text-gray-500">
             Looking for an opportunity to grow and make an impact? At
-            CampusBazaar, we’re building a student-driven marketplace that makes
+            ScholarNest, we’re building a student-driven marketplace that makes
             education more accessible. Join us in creating innovative solutions
             that help students buy and sell study materials with ease. Explore
             exciting roles and be part of a dynamic team shaping the future of
             student commerce! 📚💼
           </p>
-          <button onClick={()=>navigate('/jobs')} className="border rounded border-black px-8 py-4 hover:bg-black hover:text-white transition-all duration-500">
+          <button
+            onClick={() => navigate("/jobs")}
+            className="border rounded border-black px-8 py-4 hover:bg-black hover:text-white transition-all duration-500"
+          >
             Explore Jobs
           </button>
         </div>

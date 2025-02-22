@@ -30,10 +30,36 @@ const placeOrder = async (req, res) => {
     const newOrder = new orderModel(orderData);
     await newOrder.save();
     await userModel.findByIdAndUpdate(userId, { cartData: {} });
+    await notifyOrders(userId,newOrder._id)
     res.json({
       success: true,
       message: "Order Placed",
     });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+//
+const notifyOrders = async (userId,orderId) => {
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return console.log("User Not Found");
+    }
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: user.email,
+      subject: "Order Confirmation",
+      text: `Your order has been placed successfully! Order ID: ${orderId}`,
+    };
+    await transporter.sendMail(mailOptions);
+    console.log("Order Notification Sent!");
+    
   } catch (error) {
     console.log(error);
     res.json({
@@ -259,6 +285,7 @@ export {
   placeOrderRazorpay,
   allOrders,
   userOrders,
+  notifyOrders,
   updateStatus,
   verifyStripe,
   verifyRazorpay,

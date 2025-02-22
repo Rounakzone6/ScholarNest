@@ -54,9 +54,7 @@ const Collection = () => {
       );
     }
     if (year.length > 0) {
-      productsCopy = productsCopy.filter((item) =>
-        year.includes(item.year)
-      );
+      productsCopy = productsCopy.filter((item) => year.includes(item.year));
     }
     setFilterProducts(productsCopy);
   };
@@ -112,7 +110,7 @@ const Collection = () => {
                 onChange={toggleCategory}
                 className="w-3"
                 type="checkbox"
-                value={"books"}
+                value={"Engineering"}
               />{" "}
               Engineering
             </p>
@@ -121,7 +119,7 @@ const Collection = () => {
                 onChange={toggleCategory}
                 className="w-3"
                 type="checkbox"
-                value={"Notes"}
+                value={"Dental"}
               />{" "}
               Dental
             </p>
@@ -130,7 +128,7 @@ const Collection = () => {
                 onChange={toggleCategory}
                 className="w-3"
                 type="checkbox"
-                value={"Notes"}
+                value={"Farmacy"}
               />{" "}
               Farmacy
             </p>
@@ -139,7 +137,7 @@ const Collection = () => {
                 onChange={toggleCategory}
                 className="w-3"
                 type="checkbox"
-                value={"Notes"}
+                value={"Competitive"}
               />{" "}
               Competitive Exam
             </p>
@@ -148,7 +146,7 @@ const Collection = () => {
                 onChange={toggleCategory}
                 className="w-3"
                 type="checkbox"
-                value={"Others"}
+                value={"MBA/LLB/B.Com/.."}
               />{" "}
               MBA/LLB/B.Com/..
             </p>

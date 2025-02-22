@@ -132,7 +132,7 @@ const Login = () => {
         required
       />
       <div className="w-full flex justify-between text-sm mt-[-8px]">
-        {currentState==="Login"?<p onClick={()=>navigate('/forgot-password')} className="cursor-pointer text-blue-700 hover:underline hover:text-blue-800">Forgot password</p>:<p></p>}
+        {currentState==="Login"?<p onClick={()=>navigate('/reset-password')} className="cursor-pointer text-blue-700 hover:underline hover:text-blue-800">Forgot password</p>:<p></p>}
         
         {currentState === "Login" ? (
           <p

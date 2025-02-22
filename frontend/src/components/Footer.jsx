@@ -18,7 +18,7 @@ const Footer = () => {
             alt=""
           />
           <p className="w-full md:w-2/3 text-gray-600">
-            CampusBazaar - Your go-to platform for buying and selling used
+            ScholarNest - Your go-to platform for buying and selling used
             books, notes, and stationery within your campus. Connect with
             seniors, find affordable study materials, and make learning more
             accessible.
@@ -72,7 +72,7 @@ const Footer = () => {
               +91-7667991277
             </li>
             <li className="hover:underline hover:text-gray-800">
-              campusbazaar@gmail.com
+              rounakgupta002@gmail.com
             </li>
           </ul>
         </div>
@@ -80,7 +80,7 @@ const Footer = () => {
       <div>
         <hr />
         <p className="py-5 text-sm text-center">
-          Copyright 2025© campusbazaar.com - All Right Reserved
+          Copyright 2025© scholarnest.com - All Right Reserved
         </p>
       </div>
     </div>

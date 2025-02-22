@@ -14,6 +14,8 @@ import SearchBar from "./components/SearchBar";
 import { ToastContainer } from 'react-toastify';
 import Verify from "./pages/Verify";
 import MyProfile from "./pages/MyProfile";
+import ResetPassword from "./pages/ResetPassword";
+import EmailVerify from "./pages/EmailVerify";
 
 const App = () => {
   return (
@@ -30,6 +32,8 @@ const App = () => {
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/email-verify" element={<EmailVerify />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/verify" element={<Verify />} />

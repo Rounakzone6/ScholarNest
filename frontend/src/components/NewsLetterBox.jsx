@@ -6,7 +6,7 @@ const NewsLetterBox = () => {
   return (
     <div className="text-center">
       <p className="text-2xl font-medium text-gray-800">
-        Unlock 20% Off on Your CampusBazaar Subscription! 🎉
+        Unlock 20% Off on Your ScholarNest Subscription! 🎉
       </p>
       <p className="text-gray-400 mt-3">
         Subscribe now and enjoy exclusive benefits, priority listings, and
