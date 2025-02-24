@@ -18,7 +18,7 @@ const Hero = () => {
           >
             <p className="w-8 md:w-11 h-[2px] bg-[#414141]"></p>
             <p className="cursor-pointer hover:scale-102 font-medium text-sm md:text-base">
-              OUT BESTSELLERS
+              OUR BESTSELLERS
             </p>
           </div>
           <h1
