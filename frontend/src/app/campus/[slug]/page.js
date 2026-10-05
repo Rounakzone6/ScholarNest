@@ -91,7 +91,7 @@ export default async function CampusPage({ params }) {
         {/* Results Grid */}
         {error ? (
           <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center text-red-600">
-            We couldn't load the campus marketplace. Check your connection.
+            We couldn&apos;t load the campus marketplace. Check your connection.
           </div>
         ) : listings.length ? (
           <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">

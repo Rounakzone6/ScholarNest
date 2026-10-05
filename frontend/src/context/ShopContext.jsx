@@ -9,7 +9,10 @@ export const ShopContext = createContext();
 
 const ShopContextProvider = ({ children }) => {
   const currency = "₹";
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+  const backendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "http://localhost:4000";
 
   // Prevent hydration mismatch by lazy loading token
   const [token, setToken] = useState("");
@@ -17,7 +20,8 @@ const ShopContextProvider = ({ children }) => {
   const router = useRouter();
   
   useEffect(() => {
-    setToken(localStorage.getItem("token") || "");
+    const storedToken = window.localStorage.getItem("token") || "";
+    if (storedToken) setToken(storedToken);
   }, []);
 
   // Ensure axios requests include the token automatically
@@ -28,7 +32,7 @@ const ShopContextProvider = ({ children }) => {
     } else if (token === "") {
       delete axios.defaults.headers.common["token"];
       localStorage.removeItem("token");
-      setUser(null);
+      queueMicrotask(() => setUser(null));
     }
   }, [token]);
 
@@ -49,7 +53,7 @@ const ShopContextProvider = ({ children }) => {
   }, [token, backendUrl]);
 
   useEffect(() => {
-    loadProfile();
+    void loadProfile();
   }, [loadProfile]);
 
   const logout = () => {

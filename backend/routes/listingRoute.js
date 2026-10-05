@@ -15,7 +15,6 @@ const router = express.Router();
 
 // Public routes
 router.get("/", listListings);
-router.get("/:id", getListing);
 
 // Protected routes (User)
 router.get("/user/mine", userAuth, myListings);
@@ -24,5 +23,8 @@ router.post("/", userAuth, upload.fields([{ name: "images", maxCount: 6 }]), cre
 // Protected routes (Admin)
 router.get("/admin/moderation", adminAuth, moderationQueue);
 router.post("/admin/moderate", adminAuth, moderateListing);
+
+// Keep the parameterized route last so it cannot swallow named endpoints.
+router.get("/:id", getListing);
 
 export default router;

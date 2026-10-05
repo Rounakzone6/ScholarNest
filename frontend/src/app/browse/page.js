@@ -139,7 +139,7 @@ export default async function BrowsePage({ searchParams }) {
       {/* Results Grid */}
       {error ? (
         <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center text-red-600">
-          We couldn't load listings. Check your connection.
+          We couldn&apos;t load listings. Check your connection.
         </div>
       ) : listings.length ? (
         <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
