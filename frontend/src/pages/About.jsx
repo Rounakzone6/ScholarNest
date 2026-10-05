@@ -1,42 +1,4 @@
-import { assets } from "../assets/assets"
-import NewsLetterBox from "../components/NewsLetterBox"
-import Title from "../components/Title"
+import { Link } from "react-router-dom";
 
-const About = () => {
-  return (
-    <div>
-      <div className="text-2xl text-center pt-8 border-t">
-        <Title text1={'ABOUT'} text2={'US'} />
-      </div>
-      <div className="my-10 flex flex-col md:flex-row gap-16">
-        <img className="w-full max-w-[450px]" src={assets.about_img} alt="" />
-        <div className="flex flex-col justify-center gap-6 md:w-2/4 text-gray-600">
-          <p>ScholarNest is a student-driven marketplace designed to make buying and selling study materials easy and affordable. Whether you are looking for second-hand books, notes, or stationery, we connect students within the campus to ensure a seamless exchange of resources.</p>
-          <p>Our goal is to reduce academic expenses while promoting a sustainable way of sharing knowledge. Join our growing community and make the most of your campus resources! 🚀📚</p>
-          <b className="text-gray-800">Our Mission</b>
-          <p>ScholarNest is dedicated to making education more accessible and affordable by connecting students to buy and sell books, notes, and stationery effortlessly. We promote a sustainable and collaborative student community where resources are reused, reducing waste and academic expenses. 📚🌱</p>
-        </div>
-      </div>
-      <div className="text-xl py-4">
-        <Title text1={'WHY'} text2={'CHOOSE US'}/>
-      </div>
-      <div className="flex flex-col md:flex-row text-sm mb-20">
-        <div className="border px-10 md:px-16 py-8 sm:py-20 flex flex-col gap-5">
-          <b>Quality Assurance:</b>
-          <p className="text-gray-600">At ScholarNest, we are committed to delivering a seamless and reliable experience for our users. Every listing is verified for accuracy, and we ensure secure transactions, transparent communication, and high-quality resources. Your trust and satisfaction are our top priorities.</p>
-        </div>
-        <div className="border px-10 md:px-16 py-8 sm:py-20 flex flex-col gap-5">
-          <b>Convenience:</b>
-          <p className="text-gray-600">ScholarNest makes buying and selling second-hand books, notes, and stationery effortless. With easy-to-use features, secure transactions, and quick access to resources, we save you time and effort, so you can focus on what matters most—your education.</p>
-        </div>
-        <div className="border px-10 md:px-16 py-8 sm:py-20 flex flex-col gap-5">
-          <b>Exceptional Customer Service</b>
-          <p className="text-gray-600">At ScholarNest, we prioritize your needs with prompt, friendly, and reliable support. Whether you are buying, selling, or just need assistance, our team is here to ensure your experience is smooth and satisfying. Your success is our success!</p>
-        </div>
-      </div>
-      <NewsLetterBox />
-    </div>
-  )
-}
-
-export default About
+const About = () => <main className="mx-auto max-w-5xl py-12 pb-28"><section className="rounded-3xl bg-[#111b35] px-6 py-12 text-white sm:px-12 sm:py-16"><p className="text-xs font-extrabold uppercase tracking-[.17em] text-emerald-300">How ScholarNest works</p><h1 className="heading mt-3 max-w-2xl text-3xl font-extrabold leading-tight sm:text-5xl">A campus is better when good things keep moving.</h1><p className="mt-5 max-w-2xl leading-7 text-slate-300">ScholarNest helps students pass useful second-hand things on to other students nearby. Find a fair price, connect directly, and choose a public place for a local handoff.</p><Link to="/browse" className="mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-slate-900">Browse the marketplace</Link></section><section className="mt-10 grid gap-4 md:grid-cols-3">{[["01","Find something useful","Browse items students have listed around their campus."],["02","Talk through the details","Ask questions and agree on a price and handoff that work for both of you."],["03","Meet and pass it on","Choose a public campus location and give the item another life."]].map(([n,title,body])=><article key={n} className="rounded-2xl border border-slate-200 bg-white p-6"><span className="text-xs font-extrabold text-indigo-700">STEP {n}</span><h2 className="heading mt-3 font-extrabold">{title}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{body}</p></article>)}</section><section className="mt-10 rounded-3xl border border-emerald-100 bg-emerald-50/70 p-6 sm:p-9"><h2 className="heading text-2xl font-extrabold">Keep local exchanges thoughtful.</h2><ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-700 sm:grid-cols-2"><li>• Meet in a busy public place such as a library or campus cafeteria.</li><li>• Check the item&apos;s condition before completing an exchange.</li><li>• Keep personal addresses and sensitive payment details private.</li><li>• If something feels wrong, end the conversation and seek campus support.</li></ul></section><section className="mt-10 flex flex-col justify-between gap-4 rounded-3xl bg-indigo-50 p-6 sm:flex-row sm:items-center sm:p-8"><div><h2 className="heading text-xl font-extrabold">Have a useful item to pass on?</h2><p className="mt-1 text-sm text-slate-600">Put it in front of students who can use it next.</p></div><Link to="/sell" className="rounded-xl bg-indigo-600 px-5 py-3 text-center text-sm font-bold text-white">Sell an item</Link></section></main>;
+export default About;

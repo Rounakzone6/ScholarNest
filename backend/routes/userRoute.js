@@ -8,24 +8,36 @@ import {
   resetPassword,
   sendResetOtp,
   sendVerifyOtp,
-  userProfile,
+  getMe,
+  getPublicProfile,
+  updateProfile,
   verifyEmail,
+  getVerificationQueue,
+  moderateUser,
 } from "../controllers/userController.js";
 import userAuth from "../middleware/userAuth.js";
+import adminAuth from "../middleware/adminAuth.js";
+import { authRateLimit, otpRateLimit } from "../middleware/rateLimit.js";
 
 const userRouter = express.Router();
 
-userRouter.post("/register", registerUser);
-userRouter.post("/login", loginUser);
+userRouter.post("/register", authRateLimit, registerUser);
+userRouter.post("/login", authRateLimit, loginUser);
 userRouter.post("/logout", logout);
-userRouter.get("/get-profile", userAuth, userProfile);
-userRouter.post("/admin", adminLogin);
+userRouter.get("/get-profile", userAuth, getMe);
+userRouter.put("/profile", userAuth, updateProfile);
+userRouter.get("/profile/:username", getPublicProfile);
+userRouter.post("/admin", authRateLimit, adminLogin);
 
-//OTP
-userRouter.post("/send-verify-otp", userAuth, sendVerifyOtp);
+// OTP
+userRouter.post("/send-verify-otp", userAuth, otpRateLimit, sendVerifyOtp);
 userRouter.post("/verify-account", userAuth, verifyEmail);
 userRouter.post("/is-auth", userAuth, isAuthenticated);
-userRouter.post("/send-reset-otp", sendResetOtp);
-userRouter.post("/reset-password", resetPassword);
+userRouter.post("/send-reset-otp", otpRateLimit, sendResetOtp);
+userRouter.post("/reset-password", authRateLimit, resetPassword);
+
+// Admin Routes
+userRouter.get("/admin/verification-queue", adminAuth, getVerificationQueue);
+userRouter.post("/admin/moderate-user", adminAuth, moderateUser);
 
 export default userRouter;

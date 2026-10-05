@@ -1,292 +1,176 @@
-import orderModel from "../models/orderModel.js";
-import userModel from "../models/userModel.js";
-import Stripe from "stripe";
-import razorpay from "razorpay";
+import Order from "../models/orderModel.js";
+import Listing from "../models/listingModel.js";
+import User from "../models/userModel.js";
+import { notifyByEmail } from "../services/notificationService.js";
+import { getEmailHtml } from "../services/emailService.js";
+import { ORDER_STATUS, LISTING_STATUS } from "../constants/index.js";
+import mongoose from "mongoose";
 
-// global variables
-const currency = "inr";
-const deliveryCharge = 10;
+// ── Reserve Listing (Checkout) ───────────────────────────────────────
+export const reserveListing = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-// Gateway initialize
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const razorpayInstance = new razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-// Placing orders using COD Method
-const placeOrder = async (req, res) => {
   try {
-    const { userId, items, amount, address } = req.body;
-    const orderData = {
-      userId,
-      items,
-      amount,
-      address,
-      paymentMethod: "COD",
-      payment: false,
-      date: Date.now(),
-    };
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
-    await notifyOrders(userId,newOrder._id)
-    res.json({
-      success: true,
-      message: "Order Placed",
-    });
-  } catch (error) {
-    console.log(error);
-    res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+    const { listingId, pickupType, pickupLocation, paymentMethod } = req.body;
+    const buyerId = req.userId;
 
-//
-const notifyOrders = async (userId,orderId) => {
-  try {
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return console.log("User Not Found");
+    // 1. Atomically lock the listing (must be PUBLISHED)
+    const listing = await Listing.findOneAndUpdate(
+      { _id: listingId, status: LISTING_STATUS.PUBLISHED, sellerId: { $ne: buyerId } },
+      { $set: { status: LISTING_STATUS.RESERVED } },
+      { new: true, session }
+    );
+
+    if (!listing) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(409).json({ success: false, message: "This item is no longer available." });
     }
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Order Confirmation",
-      text: `Your order has been placed successfully! Order ID: ${orderId}`,
-    };
-    await transporter.sendMail(mailOptions);
-    console.log("Order Notification Sent!");
+
+    // 2. Snapshots
+    const [buyer, seller] = await Promise.all([
+      User.findById(buyerId).select("name email phone").session(session),
+      User.findById(listing.sellerId).select("name email").session(session),
+    ]);
+
+    // 3. Create the order
+    const orderNumber = Order.generateOrderNumber();
+    const order = await Order.create(
+      [
+        {
+          orderNumber,
+          buyerId,
+          sellerId: listing.sellerId,
+          listingId: listing._id,
+          amount: listing.price,
+          total: listing.price,
+          pickupType: pickupType || "Campus meetup",
+          pickupLocation,
+          paymentMethod,
+          orderStatus: ORDER_STATUS.RESERVED,
+          buyerName: buyer.name,
+          buyerPhone: buyer.phone,
+          buyerEmail: buyer.email,
+          sellerName: seller.name,
+          reservedUntil: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hrs to complete
+        },
+      ],
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // 4. Notifications (outside transaction)
+    const html = getEmailHtml("order_confirmation", {
+      buyerName: buyer.name,
+      listingTitle: listing.title,
+      orderNumber,
+      amount: listing.price,
+    });
     
-  } catch (error) {
-    console.log(error);
-    res.json({
-      success: false,
-      message: error.message,
+    await notifyByEmail({
+      to: seller.email,
+      subject: "A student reserved your ScholarNest listing",
+      html,
+      userId: seller._id,
+      type: "listing_reserved",
+      title: "Item reserved!",
+      message: `${buyer.name} reserved "${listing.title}". Meet at campus to hand off.`,
+      data: { orderId: order[0]._id },
     });
-  }
-};
 
-// Placing orders using Stripe Method
-const placeOrderStripe = async (req, res) => {
-  try {
-    const { userId, items, amount, address } = req.body;
-
-    const { origin } = req.headers;
-
-    const orderData = {
-      userId,
-      items,
-      amount,
-      address,
-      paymentMethod: "Stripe",
-      payment: false,
-      date: Date.now(),
-    };
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
-
-    const line_items = items.map((item) => ({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: item.name,
-        },
-        unit_amount: item.price * 100,
-      },
-      quantity: item.quantity,
-    }));
-    line_items.push({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: "Delivert Charges",
-        },
-        unit_amount: deliveryCharge * 100,
-      },
-      quantity: 1,
-    });
-    const session = await stripe.checkout.sessions.create({
-      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
-      line_items,
-      mode: "payment",
-    });
-    res.json({
+    res.status(201).json({
       success: true,
-      session_url: session.url,
+      order: order[0],
+      message: "Item reserved successfully. Arrange your handoff.",
     });
   } catch (error) {
-    console.log(error);
-    res.json({
-      success: false,
-      message: error.message,
-    });
+    await session.abortTransaction();
+    session.endSession();
+    next(error);
   }
 };
 
-// Verify stripe
-const verifyStripe = async (req, res) => {
-  const { orderId, success, userId } = req.body;
+// ── My Orders (Buyer or Seller) ───────────────────────────────────────
+export const myOrders = async (req, res, next) => {
   try {
-    if (success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
-      res.json({
-        success: true,
-        message: "Payment Successful",
-      });
+    const orders = await Order.find({
+      $or: [{ buyerId: req.userId }, { sellerId: req.userId }],
+    })
+      .populate("listingId", "title images campus locationArea")
+      .populate("buyerId", "name username avatar phone")
+      .populate("sellerId", "name username avatar")
+      .sort({ createdAt: -1 });
+
+    const formattedOrders = orders.map((order) => {
+      const isBuyer = String(order.buyerId._id) === String(req.userId);
+      return {
+        ...order.toObject(),
+        viewerRole: isBuyer ? "buyer" : "seller",
+      };
+    });
+
+    res.json({ success: true, orders: formattedOrders });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ── Update Order Status ───────────────────────────────────────────────
+export const updateOrder = async (req, res, next) => {
+  try {
+    const { orderId, action } = req.body;
+    const order = await Order.findOne({
+      _id: orderId,
+      $or: [{ buyerId: req.userId }, { sellerId: req.userId }],
+    });
+
+    if (!order) return res.status(404).json({ success: false, message: "Order not found." });
+
+    const isBuyer = String(order.buyerId) === String(req.userId);
+
+    if (action === "ready" && !isBuyer && order.orderStatus === ORDER_STATUS.RESERVED) {
+      order.orderStatus = ORDER_STATUS.READY_FOR_PICKUP;
+    } else if (action === "complete" && isBuyer && [ORDER_STATUS.RESERVED, ORDER_STATUS.READY_FOR_PICKUP].includes(order.orderStatus)) {
+      order.orderStatus = ORDER_STATUS.COMPLETED;
+      order.completedAt = new Date();
+    } else if (action === "cancel" && order.orderStatus === ORDER_STATUS.RESERVED) {
+      order.orderStatus = ORDER_STATUS.CANCELLED;
+      order.cancelledAt = new Date();
     } else {
-      await orderModel.findByIdAndDelete(orderId);
-      res.json({
-        success: false,
-        message: "Payment Unsuccessful",
-      });
+      return res.status(409).json({ success: false, message: "Invalid action for current order state." });
     }
-  } catch (error) {
-    console.log(error);
-    res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
-// Placing orders using Razorpay Method
-const placeOrderRazorpay = async (req, res) => {
-  try {
-    const { userId, items, amount, address } = req.body;
+    await order.save();
 
-    const orderData = {
-      userId,
-      items,
-      amount,
-      address,
-      paymentMethod: "Razorpay",
-      payment: false,
-      date: Date.now(),
-    };
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
+    // Cascading Listing updates
+    if (order.orderStatus === ORDER_STATUS.COMPLETED) {
+      await Listing.updateOne(
+        { _id: order.listingId, status: LISTING_STATUS.RESERVED },
+        { $set: { status: LISTING_STATUS.SOLD } }
+      );
+      // Update stats
+      await User.updateOne({ _id: order.sellerId }, { $inc: { "sellerStats.totalSales": 1 } });
+      await User.updateOne({ _id: order.buyerId }, { $inc: { "buyerStats.totalPurchases": 1 } });
+    }
 
-    const options = {
-      amount: amount * 100,
-      currency: currency.toUpperCase(),
-      receipt: newOrder._id.toString(),
+    if (order.orderStatus === ORDER_STATUS.CANCELLED) {
+      await Listing.updateOne(
+        { _id: order.listingId, status: LISTING_STATUS.RESERVED },
+        { $set: { status: LISTING_STATUS.PUBLISHED } }
+      );
+    }
+
+    const messages = {
+      [ORDER_STATUS.READY_FOR_PICKUP]: "Buyer notified that the item is ready.",
+      [ORDER_STATUS.COMPLETED]: "Exchange completed. Thank you for using ScholarNest!",
+      [ORDER_STATUS.CANCELLED]: "Reservation cancelled. Item returned to marketplace.",
     };
 
-    await razorpayInstance.orders.create(options, (error, order) => {
-      if (error) {
-        console.log(error);
-        return res.json({
-          success: false,
-          message: error,
-        });
-      }
-      res.json({
-        success: true,
-        order,
-      });
-    });
+    res.json({ success: true, order, message: messages[order.orderStatus] });
   } catch (error) {
-    console.log(error);
-    return res.json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
-};
-
-// Razorpay stripe
-const verifyRazorpay = async (req, res) => {
-  try {
-    const { razorpay_order_id, userId } = req.body;
-    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
-    if (orderInfo.status === "paid") {
-      await orderModel.findByIdAndUpdate(orderInfo.receipt, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
-      res.json({
-        success: true,
-        message: "Payment Successful",
-      });
-    } else {
-      res.json({
-        success: false,
-        message: "Payment Failed",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-// All orders data for admin panel
-const allOrders = async (req, res) => {
-  try {
-    const orders = await orderModel.find({});
-    res.json({
-      success: true,
-      orders,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-// user order data for frontend
-const userOrders = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    const orders = await orderModel.find({ userId });
-    res.json({
-      success: true,
-      orders,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-// update order status for admin panel
-const updateStatus = async (req, res) => {
-  try {
-    const { orderId, status } = req.body;
-    await orderModel.findByIdAndUpdate(orderId, { status });
-    res.json({
-      success: true,
-      message: "Status Updated",
-    });
-  } catch (error) {
-    console.log(error);
-    return res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-export {
-  placeOrder,
-  placeOrderStripe,
-  placeOrderRazorpay,
-  allOrders,
-  userOrders,
-  notifyOrders,
-  updateStatus,
-  verifyStripe,
-  verifyRazorpay,
 };

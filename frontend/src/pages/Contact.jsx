@@ -1,11 +1,8 @@
-import { useContext } from "react";
 import { assets } from "../assets/assets";
 import NewsLetterBox from "../components/NewsLetterBox";
 import Title from "../components/Title";
-import { ShopContext } from "../context/ShopContext";
 
 const Contact = () => {
-  const { navigate } = useContext(ShopContext);
   return (
     <div>
       <div className="text-center text-2xl pt-10 border-t">
@@ -26,21 +23,16 @@ const Contact = () => {
             Tel: +91 7667991277 <br /> Email: rounakgupta002@gmail.com
           </p>
           <p className="font-semibold text-xl text-gray-600">
-            Careers at ScholarNest
+            Get in touch
           </p>
           <p className="text-gray-500">
-            Looking for an opportunity to grow and make an impact? At
-            ScholarNest, we’re building a student-driven marketplace that makes
-            education more accessible. Join us in creating innovative solutions
-            that help students buy and sell study materials with ease. Explore
-            exciting roles and be part of a dynamic team shaping the future of
-            student commerce! 📚💼
+            Need help with a listing or have a safety concern? Email our team and include the listing link if it is relevant.
           </p>
           <button
-            onClick={() => navigate("/jobs")}
+            onClick={() => window.location.href = "mailto:rounakgupta002@gmail.com"}
             className="border rounded border-black px-8 py-4 hover:bg-black hover:text-white transition-all duration-500"
           >
-            Explore Jobs
+            Email ScholarNest
           </button>
         </div>
       </div>
