@@ -1,23 +1,25 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import { Badge } from "./ui/Badge";
 import { ShieldCheck } from "lucide-react";
 
 const ListingCard = ({ listing }) => {
   const seller = listing.sellerId || {};
-  const image = listing.images?.[0] || "/vite.svg";
+  const image = listing.images?.[0] || "/og-default.jpg";
   
   return (
     <Link 
-      to={`/listing/${listing._id}`} 
+      href={`/listing/${listing.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${listing._id}`} 
       className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-500/10"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-        <img 
+        <Image 
           src={image} 
           alt={listing.title} 
-          loading="lazy" 
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         
         {/* Top Left Badges */}

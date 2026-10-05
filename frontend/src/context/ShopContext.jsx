@@ -1,25 +1,31 @@
+"use client";
+
 import axios from "axios";
 import { createContext, useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = ({ children }) => {
   const currency = "₹";
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  // Prevent hydration mismatch by lazy loading token
+  const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const router = useRouter();
+  
+  useEffect(() => {
+    setToken(localStorage.getItem("token") || "");
+  }, []);
 
   // Ensure axios requests include the token automatically
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["token"] = token;
       localStorage.setItem("token", token);
-    } else {
+    } else if (token === "") {
       delete axios.defaults.headers.common["token"];
       localStorage.removeItem("token");
       setUser(null);
@@ -48,8 +54,7 @@ const ShopContextProvider = ({ children }) => {
 
   const logout = () => {
     setToken("");
-    toast.success("Signed out successfully");
-    navigate("/");
+    router.push("/");
   };
 
   const value = {
@@ -59,7 +64,7 @@ const ShopContextProvider = ({ children }) => {
     user,
     setUser,
     backendUrl,
-    navigate,
+    navigate: router.push,
     logout,
   };
 
